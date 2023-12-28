@@ -16,7 +16,7 @@ pushingForward = pd.read_csv('./csv/pushing_forward.csv')
 pushingSide = pd.read_csv('./csv/pushing_side.csv')
 
 app = Dash(__name__)
-
+server = app.server
 def make_graph(df, name):
     dfcopy = df.copy()
     meanXnoise = dfb['x'].median()
