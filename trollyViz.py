@@ -187,31 +187,72 @@ def make_animated(df, name):
     return fig
 
 app.layout = html.Div([
-    html.Div([
-        html.H1("Robot Trajectory Dashboard", style={'textAlign':'center'}),
-        html.Div([
-            dcc.Graph(id='side800', figure = make_graph(side800, "side800"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='side1200', figure = make_graph(side1200, "side1200"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='side1600', figure = make_graph(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})  
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        html.Div([
-            dcc.Graph(id='forward800', figure = make_graph(forward800, "forward800"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='forward1200', figure = make_graph(forward1200, "forward1200"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='forward1600', figure = make_graph(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'})
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        html.Div([
-            dcc.Graph(id='pushingForward', figure = make_graph(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='pushingSide', figure = make_graph(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        html.Div([
-            dcc.Graph(id='forward1600vibration', figure = show_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='side1600vibration', figure = show_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        html.Div([
-            dcc.Graph(id='forward1600fft', figure = fft_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'}),
-            dcc.Graph(id='side1600fft', figure = fft_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        dcc.Graph(id='animated', figure = make_animated(side800, "animated forward"))
+    html.H1("Ken Trolley Dashboard", style={'textAlign': 'center'}),
+    dcc.Tabs([
+        dcc.Tab(label='Trajectory Graphs', children=[
+            html.Div([
+                dcc.Graph(id='side800', figure = make_graph(side800, "side800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1200', figure = make_graph(side1200, "side1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1600', figure = make_graph(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})  
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='forward800', figure = make_graph(forward800, "forward800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1200', figure = make_graph(forward1200, "forward1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1600', figure = make_graph(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='pushingForward', figure = make_graph(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='pushingSide', figure = make_graph(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'})
+        ]),
+        dcc.Tab(label='Vibration Graphs', children=[
+            html.Div([
+                dcc.Graph(id='side800vibration', figure = show_vibrations(side800, "side800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1200vibration', figure = show_vibrations(side1200, "side1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1600vibration', figure = show_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})  
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='forward800vibration', figure = show_vibrations(forward800, "forward800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1200vibration', figure = show_vibrations(forward1200, "forward1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1600vibration', figure = show_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='pushingForwardvibration', figure = show_vibrations(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='pushingSidevibration', figure = show_vibrations(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'})
+        ]),
+        dcc.Tab(label='FFT Graphs', children=[
+            html.Div([
+                dcc.Graph(id='side800fft', figure = fft_vibrations(side800, "side800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1200fft', figure = fft_vibrations(side1200, "side1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1600fft', figure = fft_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})  
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='forward800fft', figure = fft_vibrations(forward800, "forward800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1200fft', figure = fft_vibrations(forward1200, "forward1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1600fft', figure = fft_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='pushingForwardfft', figure = fft_vibrations(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='pushingSidefft', figure = fft_vibrations(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'})
+        ]),
+        dcc.Tab(label='Animated Graphs', children=[
+            html.Div([
+                dcc.Graph(id='side800animated', figure = make_animated(side800, "side800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1200animated', figure = make_animated(side1200, "side1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='side1600animated', figure = make_animated(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})  
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='forward800animated', figure = make_animated(forward800, "forward800"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1200animated', figure = make_animated(forward1200, "forward1200"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='forward1600animated', figure = make_animated(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
+            html.Div([
+                dcc.Graph(id='pushingForwardanimated', figure = make_animated(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
+                dcc.Graph(id='pushingSideanimated', figure = make_animated(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
+            ], style={'display': 'flex', 'flex-direction': 'row'})
+        ])
     ])
 ])
 
