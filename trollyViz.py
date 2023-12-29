@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 from scipy.integrate import cumtrapz
+from scipy.fft import fft, fftfreq
+from plotly.subplots import make_subplots
 
 dfb = pd.read_csv('./csv/baseline_no_movement.csv')
 side800 = pd.read_csv('./csv/800_side.csv')
@@ -58,6 +60,78 @@ def calculate_range(data, padding_percent=10):
     padding = data_range * padding_percent / 100
     return [min(data) - padding, max(data) + padding]
 
+def fft_vibrations(df, name):
+    
+    dfcopy = df.copy()
+    # Convert the timestamp to elapsed time in seconds
+    dfcopy['elapsed_time'] = dfcopy['time'] - dfcopy['time'].iloc[0]
+
+    # Number of samples
+    N = len(dfcopy)
+    
+    # Calculate the time period between samples
+    T = dfcopy['elapsed_time'].iloc[1] - dfcopy['elapsed_time'].iloc[0]
+
+    # Perform FFT for each axis
+    fft_x = fft(dfcopy['x'].to_numpy())
+    fft_y = fft(dfcopy['y'].to_numpy())
+    fft_z = fft(dfcopy['z'].to_numpy())
+
+    # Compute the frequency bins
+    xf = fftfreq(N, T)[:N//2]
+
+    # Compute the magnitude of the FFT (2/N is a normalization factor)
+    magnitude_x = 2.0/N * np.abs(fft_x[:N//2])
+    magnitude_y = 2.0/N * np.abs(fft_y[:N//2])
+    magnitude_z = 2.0/N * np.abs(fft_z[:N//2])
+
+    # Create subplots
+    fig = make_subplots(rows=3, cols=1, subplot_titles=('FFT X-axis', 'FFT Y-axis', 'FFT Z-axis'))
+
+    # Add traces for each axis
+    fig.add_trace(go.Scatter(x=xf, y=np.log(magnitude_x), name='X-axis'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=xf, y=np.log(magnitude_y), name='Y-axis'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=xf, y=np.log(magnitude_z), name='Z-axis'), row=3, col=1)
+
+
+    # Update xaxis properties
+    fig.update_xaxes(title_text="Frequency (Hz)", row=3, col=1)
+
+    # Update yaxis properties
+    fig.update_yaxes(title_text="Magnitude", row=1, col=1)
+    fig.update_yaxes(title_text="Magnitude", row=2, col=1)
+    fig.update_yaxes(title_text="Magnitude", row=3, col=1)
+
+    # Update titles and layout
+    fig.update_layout(height=900, width=800, title_text=f"Trolley Vibration Frequency Spectrum: {name}")
+    return fig
+
+def show_vibrations(df, name):
+    # Calculate elapsed time in seconds from the first timestamp
+    dfcopy = df.copy()
+    dfcopy['elapsed_time'] = dfcopy['time'] - dfcopy['time'].iloc[0]
+
+    # Create subplots: one plot for each acceleration axis
+    fig = make_subplots(rows=3, cols=1, subplot_titles=('Acceleration X', 'Acceleration Y', 'Acceleration Z'))
+
+    # Add traces for each axis
+    fig.add_trace(go.Scatter(x=dfcopy['elapsed_time'], y=dfcopy['x'], name='X-axis'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=dfcopy['elapsed_time'], y=dfcopy['y'], name='Y-axis'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=dfcopy['elapsed_time'], y=dfcopy['z'], name='Z-axis'), row=3, col=1)
+
+    # Update xaxis properties
+    fig.update_xaxes(title_text="Elapsed Time (seconds)", row=3, col=1)
+
+    # Update yaxis properties
+    fig.update_yaxes(title_text="Acceleration (m/s²)", row=1, col=1)
+    fig.update_yaxes(title_text="Acceleration (m/s²)", row=2, col=1)
+    fig.update_yaxes(title_text="Acceleration (m/s²)", row=3, col=1)
+
+    # Update titles and layout
+    fig.update_layout(height=900, width=800, title_text=f"Trolley Vibrations (Acceleration) Over Time: {name}")
+
+    return fig
+    
 def make_animated(df, name):
     dfcopy = df.copy()
     meanXnoise = dfb['x'].median()
@@ -128,6 +202,14 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(id='pushingForward', figure = make_graph(pushingForward, "pushingForward"), style={'display': 'inline-block', 'width': '50%'}),
             dcc.Graph(id='pushingSide', figure = make_graph(pushingSide, "pushingSide"), style={'display': 'inline-block', 'width': '50%'})
+        ], style={'display': 'flex', 'flex-direction': 'row'}),
+        html.Div([
+            dcc.Graph(id='forward1600vibration', figure = show_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'}),
+            dcc.Graph(id='side1600vibration', figure = show_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})
+        ], style={'display': 'flex', 'flex-direction': 'row'}),
+        html.Div([
+            dcc.Graph(id='forward1600fft', figure = fft_vibrations(forward1600, "forward1600"), style={'display': 'inline-block', 'width': '50%'}),
+            dcc.Graph(id='side1600fft', figure = fft_vibrations(side1600, "side1600"), style={'display': 'inline-block', 'width': '50%'})
         ], style={'display': 'flex', 'flex-direction': 'row'}),
         dcc.Graph(id='animated', figure = make_animated(side800, "animated forward"))
     ])

@@ -1,1 +1,1 @@
-web: gunicorn trollyViz:app
+web: gunicorn trollyViz:server
